@@ -2,10 +2,9 @@ const express = require("express");
 
 const app = express();
 const jobRoutes = require("./routes/jobRoutes");
-
+app.use(express.json());
 app.use("/api", jobRoutes);
 
-app.use(express.json());
 
 app.get("/", (req, res) => {
   res.send("Hello Son! Backend is running");

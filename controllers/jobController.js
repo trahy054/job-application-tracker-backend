@@ -11,7 +11,16 @@ const addJob = (req, res) => {
   res.status(201).json(newJob);
 };
 
+const deleteJob = (req, res) => {
+  const id = parseInt(req.params.id);
+
+  jobs = jobs.filter(job => job.id !== id);
+
+  res.json({ message: "Job deleted successfully" });
+};
+
 module.exports = {
     getAllJobs,
-    addJob
+    addJob,
+    deleteJob
 };

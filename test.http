@@ -4,11 +4,15 @@ POST http://localhost:5000/api/jobs
 Content-Type: application/json
 
 {
-    "company" : "Google",
-    "position" : "Software Engineer",
-    "status" : "Applied",
-
     "company" : "Meta",
     "position" : "Software Engineer",
-    "status" : "Applied"
+    "status" : "Interview",
+
+    "company" : "Google",
+    "position" : "Software Engineer",
+    "status" : "Offer",
+
+    "company" : "Uber",
+    "position" : "Software Engineer",
+    "status" : "Apply"
 }

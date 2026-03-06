@@ -4,7 +4,8 @@ const {
   getAllJobs,
   addJob,
   updateJob,
-  deleteJob
+  deleteJob,
+  getJobStats
 } = require("../controllers/jobController");
 
 // GET all jobs
@@ -20,6 +21,6 @@ router.put("/:id", updateJob);
 router.delete("/:id", deleteJob);
 
 // GET job stats
-router.get("/stats", jobController.getJobStats);
+router.get("/stats", getJobStats);
 
 module.exports = router;

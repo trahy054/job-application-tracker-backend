@@ -4,7 +4,7 @@ const connectDB = require("./config/db");
 const app = express();
 const jobRoutes = require("./routes/jobRoutes");
 require("dotenv").config();
-console.log(process.env.MONGO_URI); // test env
+
 
 app.use(cors());
 app.use(express.json());

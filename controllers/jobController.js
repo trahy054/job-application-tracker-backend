@@ -1,72 +1,86 @@
-let jobs = [];
+const job = require("../models/job");
 
 // Get all jobs
-const getAllJobs = (req, res) => {
-  let result = [...jobs];
-  
-  const { status, search, sortBy } = req.query;
+const getAllJobs = async (req, res) => {
+  try {
+    const { status, search, sortBy } = req.query;
 
-  // Sort by status
-  if (status) {
-    result = result.filter(job => job.status?.toLowerCase() === status.toLowerCase());
-  }
+    let query = {};
 
-  // Search by company or position
-  if (search) {
-    const s = search.toLowerCase();
-    result = result.filter(job =>
-      job.company?.toLowerCase().includes(s) ||
-      job.position?.toLowerCase().includes(s)
-    );
-  }
+    // Filter by status
+    if (status) query.status = status;
 
-  // Sort by sortBy
-  if (sortBy) {
-    if (sortBy === "company") {
-      result.sort((a, b) => (a.company || "").localeCompare(b.company || "")); // sort by company name
-    } else if (sortBy === "id") {
-      result.sort((a, b) => b.id - a.id); // newest first
+    // Search by company or position
+    if (search) {
+      query.$or = [
+        { company: { $regex: search, $options: "i" } },
+        { position: { $regex: search, $options: "i" } },
+      ];
     }
+
+    // Build query
+    let jobsQuery = job.find(query);
+
+    // Sort
+    if (sortBy === "company") {
+      jobsQuery = jobsQuery.sort({ company: 1 });
+    } else {
+      // Sort by createdAt newest first
+      jobsQuery = jobsQuery.sort({ createdAt: -1 });
+    }
+
+    const jobs = await jobsQuery;
+    res.json(jobs);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
-    res.json(result);
 };
 
 // Add a new job
-const addJob = (req, res) => {
-  const newJob = req.body;
-  newJob.id = jobs.length + 1;
-  jobs.push(newJob);
-  res.status(201).json(newJob);
+const addJob = async (req, res) => {
+  try {
+    const { company, position, status } = req.body;
+    const newJob = await job.create({ company, position, status });
+    res.status(201).json(newJob);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
 
 // Delete a job by ID
-const deleteJob = (req, res) => {
-  const id = parseInt(req.params.id);
-
-  jobs = jobs.filter(job => job.id !== id);
-
-  res.json({ message: "Job deleted successfully" });
+const deleteJob = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await job.findByIdAndDelete(id);
+    res.json({ message: "Job deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
 
 // Update a job by ID
-const updateJob = (req, res) => {
-  const id = parseInt(req.params.id);
-  const {company , position, status} = req.body;
+const updateJob = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { company, position, status } = req.body;
 
-  const job = jobs.find(j => j.id === parseInt(id));
-  if (!job) return res.status(404).json({ message: "Job not found" });
+    const updatedJob = await job.findByIdAndUpdate(
+      id,
+      { company, position, status },
+      { new: true }
+    );
 
-  if (company) job.company = company;
-  if (position) job.position = position;
-  if (status) job.status = status;
+    if (!updatedJob) return res.status(404).json({ message: "Job not found" });
 
-  res.json(job);
-}
+    res.json(updatedJob);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
 
-// Export the controller functions
 module.exports = {
-    getAllJobs,
-    addJob,
-    deleteJob,
-    updateJob
+  getAllJobs,
+  addJob,
+  deleteJob,
+  updateJob,
 };

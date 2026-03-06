@@ -78,9 +78,31 @@ const updateJob = async (req, res) => {
   }
 };
 
+// Get job stats
+const getJobStats = async (req, res) => {
+  try {
+    const totalJobs = await job.countDocuments();
+    const appliedJobs = await job.countDocuments({ status: "Applied" });
+    const interviewJobs = await job.countDocuments({ status: "Interview" });
+    const offerJobs = await job.countDocuments({ status: "Offer" });
+    const rejectedJobs = await job.countDocuments({ status: "Rejected" });
+
+    res.json({
+      totalJobs,
+      appliedJobs,
+      interviewJobs,
+      offerJobs,
+      rejectedJobs
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 module.exports = {
   getAllJobs,
   addJob,
   deleteJob,
   updateJob,
+  getJobStats,
 };

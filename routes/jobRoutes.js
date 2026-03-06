@@ -19,4 +19,7 @@ router.put("/:id", updateJob);
 // DELETE job
 router.delete("/:id", deleteJob);
 
+// GET job stats
+router.get("/stats", jobController.getJobStats);
+
 module.exports = router;
